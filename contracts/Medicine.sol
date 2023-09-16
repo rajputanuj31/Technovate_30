@@ -10,6 +10,7 @@ contract Medicine{
         uint256 stage;
         string trackHash;
         uint256 tokenID;
+        address shipperAddress;
     }
 
     mapping(address => order) public orderMap;
@@ -17,6 +18,9 @@ contract Medicine{
     address[] public nftAddress;
     mapping(string => uint256) public nameMap;
     string[] public MedicineName;
+
+    mapping(address=>uint256) pending_orders_count;
+    mapping(address=>address[]) shipping_orders;
 
     function createOrder(address _to, string memory _name) public{
         
@@ -32,6 +36,45 @@ contract Medicine{
 
     }
 
+    function sendToSupplier(address _for, address _supplier, string updatedQR){
+
+        order orderData = orderMap[_for];
+
+        MedicineNFT i_MedicineNFT = MedicineNFT(nftAddress[nameMap[orderData.name]]);
+        i_MedicineNFT.safeMint(_supplier,"");
+
+        orderData.shipperAddress = _supplier;
+        orderData.stage = 1;
+        orderData.trackHash = updatedQR;
+        orderMap[_for] = orderData;
+
+        shipping_orders[_supplier].push(_for);
+
+        pending_orders[_supplier]+=1;
+
+    }
+
+    function completeOrder(address _for){
+        for(uint256 i = 0 ; i < shipping_orders[msg.sender].length ; i ++){
+            if(shipping_orders[msg.sender][i] == _for){
+                address reciever = shipping_orders[msg.sender][i];
+                pending_orders[msg.sender] -=1;
+                shipping_orders[msg.sender] = address(0);
+
+                order orderData = order[reciever];
+                uint256 tokenId = orderData.tokenID;
+
+                MedicineNFT i_MedicineNFT = MedicineNFT(nftAddress[nameMap[orderData.name]]);
+                i_MedicineNFT.transferFrom(msg.sender,reciever,tokenId);
+
+            }
+        }
+    }
+
+    function getShippingOrder()public view returns(address [] memory){
+        return shipping_orders[msg.sender];
+    }
+
     function getTokenIdAssigned() public  view returns(uint256){
         return orderMap[msg.sender].tokenID;
     }
@@ -40,10 +83,21 @@ contract Medicine{
         return orderMap[msg.sender].name;
     }
 
-    function getHELPPLS (address _address) public view returns (uint256){
-        return MedicineNFT(_address).count();
+    function getQR()  public view returns (string  memory) {
+        orderMap[msg.sender].trackHash;
     }
 
+    function getStage()  returns (uint256) {
+        orderMap[msg.sender].stage;
+    }
+
+    function getShipper()  returns (address) {
+        orderMap[msg.sender].shipperAddress;
+    }
+
+    function getPendingOrders(address _shipper)public view returns (uint256){
+        pending_orders[_shipper];
+    }
 
     function addNFTAddressName(address _nftAddress,string memory _str) public {
         nftAddress.push(_nftAddress);
