@@ -2,9 +2,24 @@
 pragma solidity ^0.8.9;
 
 contract Medicine{
+
+    struct order{
+        address to;
+        string name;
+        uint256 stage;
+        string trackHash;
+    }
+    order order1;
+
     address[] public nftAddress;
     mapping(string => uint256) public nameMap;
+    mapping(address => order) public orderMap;
     string[] public MedicineName;
+
+    function createOrder(address _to,string memory _name,uint256 _stage) public{
+         order1 = order(_to,_name,_stage, "");
+    }
+
 
     function addNFTAddressName(address _nftAddress,string memory _str) public {
         nftAddress.push(_nftAddress);
