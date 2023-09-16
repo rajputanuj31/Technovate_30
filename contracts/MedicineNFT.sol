@@ -5,18 +5,20 @@ import "@openzeppelin/contracts@4.9.3/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts@4.9.3/token/ERC721/extensions/ERC721URIStorage.sol";
 import "@openzeppelin/contracts@4.9.3/utils/Counters.sol";
 
-contract Medicine is ERC721, ERC721URIStorage {
+contract MedicineNFT is ERC721, ERC721URIStorage {
+    uint256 counter = 0 ;
     using Counters for Counters.Counter;
 
     Counters.Counter private _tokenIdCounter;
 
-    constructor() ERC721("Saridon", "SDB") {}
+    constructor() ERC721("Saridon", "SDN") {}
 
     function safeMint(address to, string memory uri) public {
         uint256 tokenId = _tokenIdCounter.current();
         _tokenIdCounter.increment();
         _safeMint(to, tokenId);
         _setTokenURI(tokenId, uri);
+        counter+=1;
     }
 
     // The following functions are overrides required by Solidity.
@@ -41,5 +43,8 @@ contract Medicine is ERC721, ERC721URIStorage {
         returns (bool)
     {
         return super.supportsInterface(interfaceId);
+    }
+    function count () external view returns (uint256){
+        return counter;
     }
 }

@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.9;
+import "./MedicineNFT.sol";
 
 contract Medicine{
 
@@ -8,16 +9,39 @@ contract Medicine{
         string name;
         uint256 stage;
         string trackHash;
+        uint256 tokenID;
     }
-    order order1;
+
+    mapping(address => order) public orderMap;
 
     address[] public nftAddress;
     mapping(string => uint256) public nameMap;
-    mapping(address => order) public orderMap;
     string[] public MedicineName;
 
-    function createOrder(address _to,string memory _name,uint256 _stage) public{
-         order1 = order(_to,_name,_stage, "");
+    function createOrder(address _to, string memory _name) public{
+        
+        order memory order_new ;
+        order_new.name = _name;
+        
+        order_new.stage = 0;
+
+        MedicineNFT i_MedicineNFT = MedicineNFT(nftAddress[nameMap[_name]]);
+        order_new.tokenID = i_MedicineNFT.count();
+
+        orderMap[_to] = order_new;
+
+    }
+
+    function getTokenIdAssigned() public  view returns(uint256){
+        return orderMap[msg.sender].tokenID;
+    }
+
+    function getMedicineAssigned() public  view returns(string memory){
+        return orderMap[msg.sender].name;
+    }
+
+    function getHELPPLS (address _address) public view returns (uint256){
+        return MedicineNFT(_address).count();
     }
 
 
