@@ -37,7 +37,8 @@ export default function About() {
         "name": `SARIDON`,
         "tokenID": `2`,
         "price": `Hello`,
-        "to": `${patient}`
+        "to": `${patient}`,
+        "status": "Shipment created"
       }
     });
 
@@ -58,7 +59,7 @@ export default function About() {
   }
 
   async function getMedicineDetails (){
-
+    
   }
 
   return (
